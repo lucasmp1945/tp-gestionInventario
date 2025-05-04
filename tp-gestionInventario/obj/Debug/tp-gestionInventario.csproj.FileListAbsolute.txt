@@ -1,0 +1,10 @@
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\bin\Debug\tp-gestionInventario.exe.config
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\bin\Debug\tp-gestionInventario.exe
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\bin\Debug\tp-gestionInventario.pdb
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp-gestionInventario.csproj.AssemblyReference.cache
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp_gestionInventario.Properties.Resources.resources
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp-gestionInventario.csproj.GenerateResource.cache
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp-gestionInventario.csproj.CoreCompileInputs.cache
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp-gestionInventario.exe
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp-gestionInventario.pdb
+C:\Users\luqui\source\repos\tp-gestionInventario\tp-gestionInventario\obj\Debug\tp_gestionInventario.Productos.resources
