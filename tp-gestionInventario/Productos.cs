@@ -16,12 +16,14 @@ namespace tp_gestionInventario
     public partial class Productos : Form
     {
         private bool esNuevo = false;
+        private List<Producto> productosCargados = new List<Producto>();
 
         public Productos()
 
         {
             InitializeComponent();
             cargarProductos();
+            cargarCategorias();
             enabled(false);
         }
 
@@ -30,12 +32,21 @@ namespace tp_gestionInventario
             clear();
             enabled(true);
             this.esNuevo = true;
+            btnEliminar.Enabled = false;
+            btnModificar.Enabled = false;
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("Debe seleccionar un producto para modificar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             this.esNuevo = false;
             enabled(true);
+            btnNuevo.Enabled = false;
+            btnEliminar.Enabled = false;
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -43,10 +54,15 @@ namespace tp_gestionInventario
             clear();
             enabled(false);
             this.esNuevo = false;
+            btnNuevo.Enabled = true;
+            btnModificar.Enabled = true;
+            btnEliminar.Enabled = true;
         }
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            if (!validarDatos())
+                return;
 
             var repo = new productoRepository();
             var prod = crearObjProducto();
@@ -83,6 +99,9 @@ namespace tp_gestionInventario
                 cargarProductos();
                 enabled(false); 
                 esNuevo = false;
+                btnNuevo.Enabled = true;
+                btnModificar.Enabled = true;
+                btnEliminar.Enabled = true;
             }
         }
 
@@ -119,10 +138,31 @@ namespace tp_gestionInventario
         private void cargarProductos()
         {
             var repo = new productoRepository();
+            this.productosCargados = repo.getAll();
+
+            dgvProductos.DataSource = this.productosCargados;
+            dgvProductos.Columns["idCategoria"].Visible = false;
+        }
+
+        private void cargarCategorias()
+        {
+            var repo = new categoriaRepository();
             var lista = repo.getAll();
 
-            dgvProductos.DataSource = lista;
+            cmbCategorias.DataSource = lista;
+            cmbCategorias.DisplayMember = "descrip";
+            cmbCategorias.ValueMember = "idCategoria";
+
+            var listaFiltro = new List<Categoria>();
+            listaFiltro.Add(new Categoria { idCategoria = 0, descrip = "-- Seleccione --" });
+            listaFiltro.AddRange(lista);
+
+            cmbFiltroCat.DataSource = listaFiltro;
+            cmbFiltroCat.DisplayMember = "descrip";
+            cmbFiltroCat.ValueMember = "idCategoria";
+            cmbFiltroCat.SelectedIndex = 0; 
         }
+
 
         private void clear()
         {
@@ -142,6 +182,7 @@ namespace tp_gestionInventario
             txtDescripcion.Enabled = valor;
             nudPrecio.Enabled = valor;
             nudStock.Enabled = valor;
+            cmbCategorias.Enabled = valor;
         }
 
         private Producto crearObjProducto()
@@ -152,6 +193,7 @@ namespace tp_gestionInventario
             p.descripcion = txtDescripcion.Text;
             p.precio = Convert.ToDecimal(nudPrecio.Value);
             p.stock = Convert.ToInt32(nudStock.Value);
+            p.idCategoria = Convert.ToInt32(cmbCategorias.SelectedValue);
             return p;
         }
 
@@ -169,13 +211,87 @@ namespace tp_gestionInventario
                 nudPrecio.Value = Convert.ToDecimal(fila.Cells["precio"].Value);
                 nudStock.Value = Convert.ToInt32(fila.Cells["stock"].Value);
                 txtDescripcion.Text = fila.Cells["descripcion"].Value.ToString();
+                cmbCategorias.SelectedValue = Convert.ToInt32(fila.Cells["idCategoria"].Value);
+
             }
         }
 
 
         private void btnFiltrar_Click(object sender, EventArgs e)
         {
+            if (productosCargados == null)
+                return;
 
+            int idCategoria = Convert.ToInt32(cmbFiltroCat.SelectedValue);
+            string filtro = txtFiltro.Text.Trim().ToLower();
+
+            IEnumerable<Producto> filtrados = productosCargados;
+
+            if (idCategoria != 0)
+            {
+                filtrados = filtrados.Where(p => p.idCategoria == idCategoria);
+            }
+
+            if (!string.IsNullOrEmpty(filtro))
+            {
+                filtrados = filtrados.Where(p =>
+                    (!string.IsNullOrEmpty(p.codigo) && p.codigo.ToLower().Contains(filtro)) ||
+                    (!string.IsNullOrEmpty(p.nombre) && p.nombre.ToLower().Contains(filtro))
+                );
+            }
+
+            dgvProductos.DataSource = filtrados.ToList();
+            dgvProductos.Columns["idCategoria"].Visible = false;
         }
+
+
+        private bool validarDatos()
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("El campo 'Código' es obligatorio.");
+                txtCodigo.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtNombe.Text))
+            {
+                MessageBox.Show("El campo 'Nombre' es obligatorio.");
+                txtNombe.Focus();
+                return false;
+            }
+
+            if (nudPrecio.Value <= 0)
+            {
+                MessageBox.Show("El precio debe ser mayor a 0.");
+                nudPrecio.Focus();
+                return false;
+            }
+
+            if (nudStock.Value < 0)
+            {
+                MessageBox.Show("El stock no puede ser negativo.");
+                nudStock.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtDescripcion.Text))
+            {
+                MessageBox.Show("El campo 'Descripción' es obligatorio.");
+                txtDescripcion.Focus();
+                return false;
+            }
+
+            if (cmbCategorias.SelectedIndex == -1)
+            {
+                MessageBox.Show("Debe seleccionar una categoría.");
+                cmbCategorias.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+
     }
 }

@@ -19,7 +19,7 @@ namespace tp_gestionInventario.datos
             using (SqlConnection conn = conexion.ObtenerConexion())
             {
                 conn.Open();
-                string query = "SELECT * FROM productos";
+                string query = "SELECT p.*, c.descrip AS categoria FROM productos p LEFT JOIN categorias c ON c.idCategoria = p.idCategoria";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -32,7 +32,10 @@ namespace tp_gestionInventario.datos
                             nombre = reader["nombre"].ToString(),
                             precio = Convert.ToDecimal(reader["precio"]),
                             stock = Convert.ToInt32(reader["stock"]),
-                            descripcion = reader["descripcion"].ToString()
+                            descripcion = reader["descripcion"].ToString(),
+                            idCategoria = Convert.ToInt32(reader["idCategoria"]),
+                            categoria = reader["categoria"].ToString()
+
                         };
                         lista.Add(p);
                     }
@@ -47,7 +50,7 @@ namespace tp_gestionInventario.datos
             using (SqlConnection conn = conexion.ObtenerConexion())
             {
                 conn.Open();
-                string query = "INSERT INTO productos (codigo, nombre, precio, stock, descripcion) VALUES (@codigo, @nombre, @precio, @stock, @descripcion)";
+                string query = "INSERT INTO productos (codigo, nombre, precio, stock, descripcion, idCategoria) VALUES (@codigo, @nombre, @precio, @stock, @descripcion, @idCategoria)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@codigo", p.codigo);
@@ -55,6 +58,7 @@ namespace tp_gestionInventario.datos
                     cmd.Parameters.AddWithValue("@precio", p.precio);
                     cmd.Parameters.AddWithValue("@stock", p.stock);
                     cmd.Parameters.AddWithValue("@descripcion", p.descripcion);
+                    cmd.Parameters.AddWithValue("@idCategoria", p.idCategoria);
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -66,7 +70,7 @@ namespace tp_gestionInventario.datos
             using (SqlConnection conn = conexion.ObtenerConexion())
             {
                 conn.Open();
-                string query = "UPDATE productos SET nombre=@nombre, precio=@precio, stock=@stock, descripcion=@descripcion WHERE codigo=@codigo";
+                string query = "UPDATE productos SET nombre=@nombre, precio=@precio, stock=@stock, descripcion=@descripcion, idCategoria=@idCategoria WHERE codigo=@codigo";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@codigo", p.codigo);
@@ -74,6 +78,8 @@ namespace tp_gestionInventario.datos
                     cmd.Parameters.AddWithValue("@precio", p.precio);
                     cmd.Parameters.AddWithValue("@stock", p.stock);
                     cmd.Parameters.AddWithValue("@descripcion", p.descripcion);
+                    cmd.Parameters.AddWithValue("@idCategoria", p.idCategoria);
+
 
                     return cmd.ExecuteNonQuery() > 0;
                 }

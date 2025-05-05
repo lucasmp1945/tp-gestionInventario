@@ -13,5 +13,7 @@ namespace tp_gestionInventario.models
         public decimal precio { get; set; }
         public int stock { get; set; }
         public string descripcion { get; set; }
+        public int idCategoria{ get; set;}
+        public string categoria { get; set; }
     }
 }

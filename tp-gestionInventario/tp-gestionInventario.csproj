@@ -46,8 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="datos\categoriaRepository.cs" />
     <Compile Include="datos\conexion.cs" />
     <Compile Include="datos\productoRepository.cs" />
+    <Compile Include="models\categoria.cs" />
     <Compile Include="models\producto.cs" />
     <Compile Include="Productos.cs">
       <SubType>Form</SubType>
