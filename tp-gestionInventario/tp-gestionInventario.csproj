@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="datos\conexion.cs" />
+    <Compile Include="datos\productoRepository.cs" />
+    <Compile Include="models\producto.cs" />
     <Compile Include="Productos.cs">
       <SubType>Form</SubType>
     </Compile>
