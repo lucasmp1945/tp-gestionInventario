@@ -25,13 +25,31 @@ namespace tp_gestionInventario
             enabled(false);
         }
 
+        private void btnNuevo_Click(object sender, EventArgs e)
+        {
+            clear();
+            enabled(true);
+            this.esNuevo = true;
+        }
+
+        private void btnModificar_Click(object sender, EventArgs e)
+        {
+            this.esNuevo = false;
+            enabled(true);
+        }
+
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            clear();
+            enabled(false);
+            this.esNuevo = false;
+        }
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
 
             var repo = new productoRepository();
             var prod = crearObjProducto();
-
             bool rta;
 
             if (this.esNuevo)
@@ -68,15 +86,35 @@ namespace tp_gestionInventario
             }
         }
 
-
-        private void btnNuevo_Click(object sender, EventArgs e)
+        private void btnEliminar_Click(object sender, EventArgs e)
         {
-            clear();
-            enabled(true);
-            this.esNuevo = true;
+            string cod = txtCodigo.Text.Trim();
 
+            if (string.IsNullOrEmpty(cod))
+            {
+                MessageBox.Show("Seleccioná un producto para eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var confirm = MessageBox.Show("¿Estás seguro de eliminar este producto?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm == DialogResult.Yes)
+            {
+                var repo = new productoRepository();
+                bool rta = repo.delete(cod);
+
+                if (rta)
+                {
+                    MessageBox.Show("Producto eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    clear();
+                    cargarProductos();
+                }
+                else
+                {
+                    MessageBox.Show("No se pudo eliminar el producto. Verificá el código.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
-
 
         private void cargarProductos()
         {
@@ -106,7 +144,6 @@ namespace tp_gestionInventario
             nudStock.Enabled = valor;
         }
 
-
         private Producto crearObjProducto()
         {
             Producto p = new Producto();
@@ -117,14 +154,6 @@ namespace tp_gestionInventario
             p.stock = Convert.ToInt32(nudStock.Value);
             return p;
         }
-
-        private void btnCancelar_Click(object sender, EventArgs e)
-        {
-            clear();
-            enabled(false);
-            this.esNuevo = false;
-        }
-
 
         private void dgvProcutos_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -143,40 +172,10 @@ namespace tp_gestionInventario
             }
         }
 
-        private void btnEliminar_Click(object sender, EventArgs e)
+
+        private void btnFiltrar_Click(object sender, EventArgs e)
         {
-            string cod = txtCodigo.Text.Trim();
 
-            if (string.IsNullOrEmpty(cod))
-            {
-                MessageBox.Show("Seleccioná un producto para eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var confirm = MessageBox.Show("¿Estás seguro de eliminar este producto?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (confirm == DialogResult.Yes)
-            {
-                var repo = new productoRepository();
-                bool rta = repo.delete(cod);
-
-                if (rta)
-                {
-                    MessageBox.Show("Producto eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    clear(); 
-                    cargarProductos();
-                }
-                else
-                {
-                    MessageBox.Show("No se pudo eliminar el producto. Verificá el código.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void btnModificar_Click(object sender, EventArgs e)
-        {
-            this.esNuevo = false;
-            enabled(true);
         }
     }
 }
