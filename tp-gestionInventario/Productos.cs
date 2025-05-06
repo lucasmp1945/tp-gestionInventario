@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,6 +71,13 @@ namespace tp_gestionInventario
 
             if (this.esNuevo)
             {
+                var existente = buscarProducto(prod.codigo);
+                if (existente != null)
+                {
+                    MessageBox.Show($"Ya existe un producto con ese código.\nNombre: {existente.nombre}", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 rta = repo.insert(prod);
                 if (rta)
                 {
@@ -138,10 +146,22 @@ namespace tp_gestionInventario
         private void cargarProductos()
         {
             var repo = new productoRepository();
-            this.productosCargados = repo.getAll();
+            this.productosCargados =  repo.getAll();
 
             dgvProductos.DataSource = this.productosCargados;
             dgvProductos.Columns["idCategoria"].Visible = false;
+
+
+        }
+
+
+
+
+        private Producto buscarProducto(string codigo)
+        {
+            var repo = new productoRepository();
+            var prod = repo.getByCodigo(codigo);
+            return prod;
         }
 
         private void cargarCategorias()
@@ -292,6 +312,25 @@ namespace tp_gestionInventario
             return true;
         }
 
+        private void btnDescargar_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void dgvProductos_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            foreach (DataGridViewRow fila in dgvProductos.Rows)
+            {
+                var s = Convert.ToInt32(fila.Cells["stock"].Value);
+                if (s == 0)
+                {
+                    fila.DefaultCellStyle.BackColor = Color.LightCoral;
+                }
+                else if(s > 0 && s <=10)
+                {
+                    fila.DefaultCellStyle.BackColor = Color.LightGoldenrodYellow;
+                }
+            }
+        }
     }
 }

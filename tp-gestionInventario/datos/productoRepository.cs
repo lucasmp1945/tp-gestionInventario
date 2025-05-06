@@ -45,11 +45,47 @@ namespace tp_gestionInventario.datos
             return lista;
         }
 
+        public Producto getByCodigo(string codigo)
+        {
+            using (SqlConnection conn = conexion.ObtenerConexion())
+            {
+                conn.Open();
+
+                string query = "SELECT codigo, nombre, precio, stock, descripcion, idCategoria FROM productos WHERE codigo = @codigo";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@codigo", codigo);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Producto p = new Producto
+                            {
+                                codigo = reader["codigo"].ToString(),
+                                nombre = reader["nombre"].ToString(),
+                                precio = Convert.ToDecimal(reader["precio"]),
+                                stock = Convert.ToInt32(reader["stock"]),
+                                descripcion = reader["descripcion"].ToString(),
+                                idCategoria = Convert.ToInt32(reader["idCategoria"])
+                            };
+
+                            return p;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
         public bool insert(Producto p)
         {
             using (SqlConnection conn = conexion.ObtenerConexion())
             {
                 conn.Open();
+
                 string query = "INSERT INTO productos (codigo, nombre, precio, stock, descripcion, idCategoria) VALUES (@codigo, @nombre, @precio, @stock, @descripcion, @idCategoria)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
