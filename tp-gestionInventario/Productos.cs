@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using tp_gestionInventario.datos;
 using tp_gestionInventario.models;
+using ClosedXML.Excel;
+
 
 namespace tp_gestionInventario
 {
@@ -313,10 +315,6 @@ namespace tp_gestionInventario
             return true;
         }
 
-        private void btnDescargar_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void dgvProductos_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
@@ -330,6 +328,59 @@ namespace tp_gestionInventario
                 else if(s > 0 && s <=10)
                 {
                     fila.DefaultCellStyle.BackColor = Color.LightGoldenrodYellow;
+                }
+            }
+        }
+        private void btnDescargar_Click(object sender, EventArgs e)
+        {
+            if (dgvProductos.Rows.Count == 0)
+            {
+                MessageBox.Show("No hay datos para exportar.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Archivo Excel (*.xlsx)|*.xlsx",
+                Title = "Guardar como Excel",
+                FileName = "Productos"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+   
+                        var worksheet = workbook.Worksheets.Add("Productos");
+
+
+                        for (int i = 0; i < dgvProductos.Columns.Count; i++)
+                        {
+                            worksheet.Cell(1, i + 1).Value = dgvProductos.Columns[i].HeaderText;
+                        }
+
+
+                        for (int i = 0; i < dgvProductos.Rows.Count; i++)
+                        {
+                            if (dgvProductos.Rows[i].IsNewRow) continue; 
+                            for (int j = 0; j < dgvProductos.Columns.Count; j++)
+                            {
+                                worksheet.Cell(i + 2, j + 1).Value = dgvProductos.Rows[i].Cells[j].Value?.ToString();
+                            }
+                        }
+
+                        worksheet.Columns().AdjustToContents();
+
+                        workbook.SaveAs(saveFileDialog.FileName);
+
+                        MessageBox.Show("Datos exportados", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al exportar: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
