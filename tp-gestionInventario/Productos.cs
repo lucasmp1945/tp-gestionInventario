@@ -26,6 +26,7 @@ namespace tp_gestionInventario
             cargarProductos();
             cargarCategorias();
             enabled(false);
+
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)

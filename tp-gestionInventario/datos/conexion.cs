@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace tp_gestionInventario.datos
 {
@@ -11,5 +12,24 @@ namespace tp_gestionInventario.datos
         {
             return new SqlConnection(cadena);
         }
+
+        public static void EjecutarScriptMigracion()
+        {
+            string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "DBScript.sql");
+            string script = File.ReadAllText(scriptPath);
+
+            using (SqlConnection conn = new SqlConnection("Server=localhost;Integrated Security=true;"))
+            {
+                conn.Open();
+                foreach (string command in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    using (SqlCommand cmd = new SqlCommand(command, conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
     }
 }
